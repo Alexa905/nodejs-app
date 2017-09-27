@@ -5,12 +5,15 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "babel-node app.js"
+    "start": "nodemon app.js --exec babel-node"
   },
   "author": "Tatyana Alexeenkova",
   "license": "ISC",
-  "babel":  {
-    "presets": ["es2015", "stage-2"],
+  "babel": {
+    "presets": [
+      "es2015",
+      "stage-2"
+    ],
     "plugins": []
   },
   "devDependencies": {
@@ -18,6 +21,11 @@
     "babel-cli": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
-    "babel-register": "^6.26.0"
+    "babel-register": "^6.26.0",
+    "fast-csv": "^2.4.0",
+    "nodemon": "^1.12.1"
+  },
+  "dependencies": {
+    "csvtojson": "^1.1.7"
   }
 }

@@ -5,10 +5,14 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "babel app.js --presets es2015"
+    "start": "babel-node app.js"
   },
   "author": "Tatyana Alexeenkova",
   "license": "ISC",
+  "babel":  {
+    "presets": ["es2015", "stage-2"],
+    "plugins": []
+  },
   "devDependencies": {
     "babel": "^6.23.0",
     "babel-cli": "^6.26.0",

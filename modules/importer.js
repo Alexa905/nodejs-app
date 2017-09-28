@@ -1,31 +1,43 @@
-import emitter from '../eventEmitter.js'
-import csv from 'csvtojson'
-const csvPath = './data/data.csv'
-const importCsv = async csvPath => {
-	await csv().fromFile(csvPath)
-		.on('json', data => {
-			console.log('data');
-			console.log(data);
-		})
-		.on("done", function (error) {
-			if(error) throw error;
-			console.log("done");
-		});
-}
-class Importer {
-	constructor() {
-		emitter.on('dirchange', path => {
+import fs from "fs";
+import papa from "papaparse";
+import {promisify} from "util";
+const csvPath = '../data/data.csv';
+
+const csvToJson = content => {
+	return papa.parse(content, {header: true}).data;
+};
+
+const importDataSync = (path = csvPath) => {
+	try {
+		const content = fs.readFileSync(path, 'utf8');
+		return csvToJson(content);
+	} catch (error) {
+		throw error;
+	}
+
+};
+
+export class Importer {
+	constructor(emitter, eventName) {
+		emitter.on(eventName, path => {
 			console.log(`File ${path} is changed`)
-			importCsv(csvPath);
+			console.log(importDataSync(csvPath))
 		});
 	}
 
-	importAsync(csvPath){
-		importCsv(csvPath);
+	importAsync(path) {
+		return new Promise((resolve, reject) => {
+			fs.readFile(path, 'utf8', (err, data) => {
+				if (err) {
+					reject(err);
+					throw err;
+				}
+				resolve(csvToJson(data));
+			});
+		});
 	}
-	importSync(csvPath){
-		process.nextTick(() => {importCsv(csvPath)})
+
+	importSync(path) {
+		return importDataSync(path);
 	}
 }
-
-export {Importer}

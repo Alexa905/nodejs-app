@@ -1,15 +1,18 @@
 import fs from 'fs'
-import  emitter  from '../eventEmitter.js'
 
-class DirWatcher {
-	constructor(path, delay = 1000) {
+export class DirWatcher {
+	constructor(emitter, eventName) {
+		this.emitter = emitter;
+		this.eventName = eventName;
+	}
+	watch(path, delay = 1000){
 		if (path) {
-			fs.watchFile(path, {interval: delay}, () => {
-				emitter.emit('dirchange', path)
+			fs.watch(path, () => {
+				setTimeout(() => {
+					this.emitter.emit(this.eventName, path)
+				}, delay)
+
 			})
 		}
 	}
 }
-
-
-export {DirWatcher}

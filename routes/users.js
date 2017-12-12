@@ -1,7 +1,10 @@
 import {Router} from 'express';
 export const users = Router();
-import { usersData } from '../data/users';
+import db from "../models";
+const User = db.user;
 
 users.get('/', (req, res) => {
-	res.json(usersData)
+	User.findAll().then(data => {
+		res.json(data)
+	});
 });

@@ -22,8 +22,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/api/login', passport.authenticate('local', { failureRedirect: '/api/auth/404', successRedirect: '/api/homepage', session: false }));
-app.use('/api/users', verifyToken, users);
-app.use('/api/products', verifyToken, products);
+app.use('/api/users',  /*verifyToken,*/ users);
+app.use('/api/products', /*verifyToken,*/ products);
 app.use('/api/auth', auth);
 app.use('/api/auth/404', errorPage);
 app.use('/api/homepage', homePage);

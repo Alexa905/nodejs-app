@@ -4,7 +4,13 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon index.js --exec babel-node"
+    "start": "nodemon index.js --exec babel-node",
+    "start:postgres": "npm run db:create && npm run db:migrate && npm run db:fill",
+    "db:create": "node_modules/.bin/sequelize db:create",
+    "db:drop": "node_modules/.bin/sequelize db:drop",
+    "db:migrate": "node_modules/.bin/sequelize db:migrate",
+    "db:migrate:undo": "node_modules/.bin/sequelize db:migrate:undo",
+    "db:fill": "babel-node ./modules/migrator.js"
   },
   "author": "Tatyana Alexeenkova",
   "license": "ISC",
@@ -37,6 +43,9 @@
     "passport-google-oauth20": "^1.0.0",
     "passport-http-bearer": "^1.0.1",
     "passport-local": "^1.0.0",
-    "passport-twitter": "^1.0.4"
+    "passport-twitter": "^1.0.4",
+    "pg": "^6.4.1",
+    "sequelize": "^4.26.0",
+    "sequelize-cli": "^3.2.0"
   }
 }

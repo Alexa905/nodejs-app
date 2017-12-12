@@ -1,28 +1,27 @@
 import {Router} from "express";
-import EventEmitter from "events";
-import {Importer} from "../modules";
+import db from "../models";
 export const products = Router();
-const csvPath = './data/MOCK_DATA.csv';
-const emitter = new EventEmitter();
-const eventName = 'dirwatcher:changed';
-
-const importer = new Importer(emitter, eventName);
-const importedData = importer.importSync(csvPath);
-const findProductById = paramId => importedData.find(({id}) => id === paramId);
+const Product = db.product;
 
 products.get('/', (req, res) => {
-	res.end(JSON.stringify(importedData))
+	Product.findAll().then(data => {
+		res.json(data)
+	});
 });
 
 products.param('id', function (req, res, next, id) {
 	if (req.method.toLowerCase() === 'get') {
-		const product = findProductById(id);
-		if (product) {
-			req.product = product;
-			next();
-		} else {
-			res.sendStatus(404);
-		}
+		Product.findById(id).then(data => {
+			if (data) {
+				req.product = data;
+				next()
+			} else {
+				res.sendStatus(404)
+			}
+		}).catch(e => {
+			console.log(e)
+			res.sendStatus(404)
+		})
 	} else {
 		next();
 	}
@@ -36,8 +35,9 @@ products.route('/:id')
 	.post(function (req, res) {
 		let newProduct = req.body;
 		newProduct.id = req.params.id;
-		importedData.push(newProduct)
-		res.send(req.body);
+		Product.create(newProduct).then(()=>{
+			res.send(req.body);
+		});
 	});
 
 

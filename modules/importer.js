@@ -19,11 +19,13 @@ const importDataSync = path => {
 
 export class Importer {
 	constructor(emitter, eventName) {
-		emitter.on(eventName, (fileName, dirName) => {
-			const filePath = path.resolve(dirName, fileName);
-			console.log(`File ${fileName} is changed`);
-			console.log(importDataSync(filePath));
-		});
+		if(emitter) {
+			emitter.on(eventName, (fileName, dirName) => {
+				const filePath = path.resolve(dirName, fileName);
+				console.log(`File ${fileName} is changed`);
+				console.log(importDataSync(filePath));
+			});
+		}
 	}
 
 	importAsync(path) {

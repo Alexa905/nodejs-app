@@ -4,7 +4,7 @@ const app = express();
 const bodyParser = require("body-parser");
 import {localStrategy, bearerStrategy, googleStrategy, twitterStrategy, facebookStrategy, serialize, deserialize} from "./auth/strategies";
 import {verifyToken, cookieParser, errorHandler, queryParser} from "./middlewares";
-import {auth, errorPage, products, users, homePage} from "./routes";
+import {auth, errorPage, products, users, homePage, cities} from "./routes";
 
 passport.use(localStrategy);
 passport.use(bearerStrategy);
@@ -24,6 +24,7 @@ app.use(passport.session());
 app.use('/api/login', passport.authenticate('local', { failureRedirect: '/api/auth/404', successRedirect: '/api/homepage', session: false }));
 app.use('/api/users',  /*verifyToken,*/ users);
 app.use('/api/products', /*verifyToken,*/ products);
+app.use('/api/cities', cities);
 app.use('/api/auth', auth);
 app.use('/api/auth/404', errorPage);
 app.use('/api/homepage', homePage);

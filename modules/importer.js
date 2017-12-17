@@ -1,7 +1,6 @@
 import fs from "fs";
-import path from "path";
+import pathModule from "path";
 import papa from "papaparse";
-import {promisify} from "util";
 
 const csvToJson = content => {
 	return papa.parse(content, {header: true}).data;
@@ -9,7 +8,7 @@ const csvToJson = content => {
 
 const importDataSync = path => {
 	try {
-		const content = fs.readFileSync(path, 'utf8');
+		const content = fs.readFileSync(pathModule.resolve(__dirname, path), 'utf8');
 		return csvToJson(content);
 	} catch (error) {
 		throw error;
@@ -19,11 +18,13 @@ const importDataSync = path => {
 
 export class Importer {
 	constructor(emitter, eventName) {
-		emitter.on(eventName, (fileName, dirName) => {
-			const filePath = path.resolve(dirName, fileName);
-			console.log(`File ${fileName} is changed`);
-			console.log(importDataSync(filePath));
-		});
+		if(emitter) {
+			emitter.on(eventName, (fileName, dirName) => {
+				const filePath = path.resolve(dirName, fileName);
+				console.log(`File ${fileName} is changed`);
+				console.log(importDataSync(filePath));
+			});
+		}
 	}
 
 	importAsync(path) {

@@ -1,0 +1,133 @@
+---
+swagger: "2.0"
+info:
+  description: "This is a sample Product store server. \n"
+  version: "1.0.0"
+  title: "Nodejs training"
+host: "virtserver.swaggerhub.com"
+basePath: "/alexa_905/nodejs/1.0.0"
+tags:
+- name: "products"
+  description: "Everything about products"
+- name: "cities"
+  description: "Cities"
+- name: "user"
+  description: "Operations about user"
+schemes:
+- "https"
+- "http"
+paths:
+  /products:
+    get:
+      tags:
+      - "products"
+      summary: "Finds Products"
+      operationId: "findPetsByStatus"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "status"
+        in: "query"
+        description: "Status values that need to be considered for filter"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+          default: "available"
+          enum:
+          - "available"
+          - "pending"
+          - "sold"
+        collectionFormat: "multi"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Product"
+        400:
+          description: "Invalid status value"
+definitions:
+  City:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      city:
+        type: "string"
+      latitude:
+        type: "integer"
+        format: "int32"
+      longitude:
+        type: "integer"
+        format: "int32"
+      state:
+        type: "string"
+      rank:
+        type: "string"
+      capital:
+        type: "string"
+        default: "false"
+      population:
+        type: "string"
+      growth_from_2000_to_2013:
+        type: "string"
+      lastModifiedDate:
+        type: "string"
+        format: "date-time"
+    xml:
+      name: "Order"
+  Product:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+      brand:
+        type: "string"
+      company:
+        type: "string"
+      price:
+        type: "string"
+      isbn:
+        type: "string"
+    example:
+      price: "price"
+      isbn: "isbn"
+      name: "name"
+      company: "company"
+      id: 0
+      brand: "brand"
+    xml:
+      name: "Product"
+  User:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      username:
+        type: "string"
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      password:
+        type: "string"
+    xml:
+      name: "User"
+  Tag:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+    xml:
+      name: "Tag"

@@ -4,6 +4,10 @@ const through = require('through2');
 const request = require('request');
 const split = require('split');
 const papa = require("papaparse");
+const path = require("path");
+const https = require('https');
+const promisify = require('util').promisify;
+const Readable = require('stream').Readable;
 const pathToCssFile = 'https://www.epam.com/etc/clientlibs/foundation/main.min.fc69c13add6eae57cd247a91c7e26a15.css';
 
 let argv = process.argv;
@@ -57,11 +61,27 @@ const utils = {
 	stdinToUppercase: () => {
 		process.stdin.setEncoding('utf8');
 
-		let transform = through(function (chunk, enc, callback) {
-			this.push(chunk.toString().toUpperCase());
-			callback();
+		process.stdin.on('readable', function () {
+			var chunk = process.stdin.read();
+			if (chunk !== null) {
+				process.stdout.write('data: ' + chunk);
+				process.stdin.end();
+			}
 		});
-		process.stdin.pipe(transform).pipe(process.stdout)
+
+		process.stdin.on('end', function () {
+			process.stdout.write('end');
+		});
+
+		/*		let transform = through(function (chunk, enc, callback) {
+
+		 this.push(chunk.toString().toUpperCase());
+		 callback();
+		 });
+		 process.stdout.write('Input string to be uppercase:  ');
+		 process.stdin.pipe(transform).pipe(process.stdout).on('end', function() {  // this event will not trigger
+		 process.exit()
+		 });*/
 	},
 	transformCsvToJson: () => {
 		let reader = fs.createReadStream('../data/data.csv');
@@ -71,14 +91,42 @@ const utils = {
 		let reader = fs.createReadStream('../data/data.csv');
 		let writer = fs.createWriteStream('../data/data.json');
 		reader.pipe(transformPipe).pipe(writer);
-	},
-	cssBundler: () => {
-		let path = args.path;
-		if (path) {
 
-			fs.readdirSync(testFolder).forEach(file => {
-				console.log(file);
-			})
+	},
+	cssBundler: async () => {
+		const folderPath = args.path;
+
+		if (folderPath) {
+			const outputFile = `${folderPath}/bundle.css`;
+			if (fs.existsSync(outputFile)) {
+				fs.unlinkSync(outputFile);
+			}
+
+			const promisify = require('util').promisify;
+			const urlToCssFile = 'https://www.epam.com/etc/clientlibs/foundation/main.min.fc69c13add6eae57cd247a91c7e26a15.css';
+			const write = fs.createWriteStream(outputFile);
+			const cssBundle = await concatFiles(folderPath, 'css');
+
+			const transformPipe = through(function (chunk, enc, callback) {
+				this.push(cssBundle);
+				this.push(chunk.toString());
+				callback();
+			});
+
+			async function concatFiles(folderPath, extension = '.') {
+				const files = await promisify(fs.readdir)(folderPath);
+				return files.reduce((content, file) => {
+					if (path.extname(file).includes(extension)) {
+						content += String(fs.readFileSync(`${folderPath}/${file}`))
+					}
+					return content;
+				}, '');
+			}
+
+			request(urlToCssFile).pipe(transformPipe).pipe(write);
+
+
+
 
 		} else {
 			console.log('Please provide the path to folder with *.css files as argument "path" to command line, e.g. --path ./css ')
